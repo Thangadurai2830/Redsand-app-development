@@ -15,6 +15,7 @@ class ListingModel extends ListingEntity {
     required super.isBoosted,
     required super.bedrooms,
     required super.areaSqft,
+    super.amenities,
   });
 
   factory ListingModel.fromJson(Map<String, dynamic> json) {
@@ -31,6 +32,7 @@ class ListingModel extends ListingEntity {
       isBoosted: json['is_boosted'] as bool? ?? false,
       bedrooms: json['bedrooms'] as int? ?? 0,
       areaSqft: (json['area_sqft'] as num?)?.toDouble() ?? 0,
+      amenities: _parseAmenities(json['amenities']),
     );
   }
 
@@ -48,7 +50,22 @@ class ListingModel extends ListingEntity {
       'is_boosted': isBoosted,
       'bedrooms': bedrooms,
       'area_sqft': areaSqft,
+      'amenities': amenities,
     };
+  }
+
+  static List<String> _parseAmenities(Object? value) {
+    if (value is List) {
+      return value.whereType<String>().toList(growable: false);
+    }
+    if (value is String && value.isNotEmpty) {
+      return value
+          .split(',')
+          .map((amenity) => amenity.trim())
+          .where((amenity) => amenity.isNotEmpty)
+          .toList(growable: false);
+    }
+    return const [];
   }
 }
 

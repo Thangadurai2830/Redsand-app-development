@@ -32,6 +32,16 @@ import '../../features/onboarding/presentation/bloc/onboarding_bloc.dart';
 // Search result feature
 import '../../features/search_result/presentation/bloc/search_result_bloc.dart';
 
+// Saved searches feature
+import '../../features/saved_searches/data/datasources/saved_searches_local_data_source.dart';
+import '../../features/saved_searches/data/datasources/saved_searches_remote_data_source.dart';
+import '../../features/saved_searches/data/repositories/saved_searches_repository_impl.dart';
+import '../../features/saved_searches/domain/repositories/saved_searches_repository.dart';
+import '../../features/saved_searches/domain/usecases/get_saved_searches.dart';
+import '../../features/saved_searches/domain/usecases/remove_saved_search.dart';
+import '../../features/saved_searches/domain/usecases/save_saved_search.dart';
+import '../../features/saved_searches/presentation/bloc/saved_searches_bloc.dart';
+
 // Home feature
 import '../../features/home/data/datasources/home_local_data_source.dart';
 import '../../features/home/data/datasources/home_remote_data_source.dart';
@@ -39,6 +49,66 @@ import '../../features/home/data/repositories/home_repository_impl.dart';
 import '../../features/home/domain/repositories/home_repository.dart';
 import '../../features/home/domain/usecases/get_home_data.dart';
 import '../../features/home/presentation/bloc/home_bloc.dart';
+
+// Property details feature
+import '../../features/property_details/data/datasources/property_details_local_data_source.dart';
+import '../../features/property_details/data/datasources/property_details_remote_data_source.dart';
+import '../../features/property_details/data/repositories/property_details_repository_impl.dart';
+import '../../features/property_details/domain/repositories/property_details_repository.dart';
+import '../../features/property_details/presentation/bloc/property_details_bloc.dart';
+
+// Reviews feature
+import '../../features/reviews/data/datasources/reviews_remote_data_source.dart';
+import '../../features/reviews/data/repositories/reviews_repository_impl.dart';
+import '../../features/reviews/domain/repositories/reviews_repository.dart';
+import '../../features/reviews/domain/usecases/get_property_reviews.dart';
+import '../../features/reviews/domain/usecases/submit_review.dart';
+import '../../features/reviews/presentation/bloc/reviews_bloc.dart';
+
+// Schedule visit feature
+import '../../features/schedule_visit/data/datasources/schedule_visit_remote_data_source.dart';
+import '../../features/schedule_visit/data/repositories/schedule_visit_repository_impl.dart';
+import '../../features/schedule_visit/domain/repositories/schedule_visit_repository.dart';
+import '../../features/schedule_visit/domain/usecases/schedule_visit.dart';
+import '../../features/schedule_visit/presentation/bloc/schedule_visit_bloc.dart';
+
+// Maintenance requests feature
+import '../../features/maintenance_requests/data/datasources/maintenance_local_data_source.dart';
+import '../../features/maintenance_requests/data/datasources/maintenance_remote_data_source.dart';
+import '../../features/maintenance_requests/data/repositories/maintenance_repository_impl.dart';
+import '../../features/maintenance_requests/domain/repositories/maintenance_repository.dart';
+import '../../features/maintenance_requests/domain/usecases/get_maintenance_history.dart';
+import '../../features/maintenance_requests/domain/usecases/raise_maintenance_request.dart';
+import '../../features/maintenance_requests/presentation/bloc/maintenance_requests_bloc.dart';
+
+// Rent receipts feature
+import '../../features/rent_receipts/data/datasources/rent_receipts_local_data_source.dart';
+import '../../features/rent_receipts/data/datasources/rent_receipts_remote_data_source.dart';
+import '../../features/rent_receipts/data/repositories/rent_receipts_repository_impl.dart';
+import '../../features/rent_receipts/domain/repositories/rent_receipts_repository.dart';
+import '../../features/rent_receipts/domain/usecases/download_rent_receipt.dart';
+import '../../features/rent_receipts/domain/usecases/get_rent_receipts.dart';
+import '../../features/rent_receipts/presentation/bloc/rent_receipts_bloc.dart';
+
+// Saved listings feature
+import '../../features/saved_listings/data/datasources/saved_listings_local_data_source.dart';
+import '../../features/saved_listings/data/datasources/saved_listings_remote_data_source.dart';
+import '../../features/saved_listings/data/repositories/saved_listings_repository_impl.dart';
+import '../../features/saved_listings/domain/repositories/saved_listings_repository.dart';
+import '../../features/saved_listings/domain/usecases/get_saved_listings.dart';
+import '../../features/saved_listings/domain/usecases/remove_saved_listing.dart';
+import '../../features/saved_listings/presentation/bloc/saved_listings_bloc.dart';
+
+// Profile feature
+import '../../features/profile/data/datasources/profile_local_data_source.dart';
+import '../../features/profile/data/datasources/profile_remote_data_source.dart';
+import '../../features/profile/data/repositories/profile_repository_impl.dart';
+import '../../features/profile/domain/repositories/profile_repository.dart';
+import '../../features/profile/domain/usecases/get_profile.dart';
+import '../../features/profile/domain/usecases/get_site_visits.dart';
+import '../../features/profile/domain/usecases/submit_kyc_documents.dart';
+import '../../features/profile/domain/usecases/update_profile.dart';
+import '../../features/profile/presentation/bloc/profile_bloc.dart';
 
 // Role selection feature
 import '../../features/role_selection/data/datasources/role_selection_local_data_source.dart';
@@ -61,6 +131,9 @@ import '../../features/otp/domain/repositories/otp_repository.dart';
 import '../../features/otp/domain/usecases/verify_otp_usecase.dart';
 import '../../features/otp/domain/usecases/resend_otp_usecase.dart';
 import '../../features/otp/presentation/bloc/otp_bloc.dart';
+
+// Theme
+import '../theme/theme_cubit.dart';
 
 // Feature selection feature
 import '../../features/feature_selection/data/datasources/feature_local_data_source.dart';
@@ -133,6 +206,28 @@ Future<void> init() async {
   // ─── Search Result ────────────────────────────────────────────────────────
   sl.registerFactory(() => SearchResultBloc(searchListings: sl()));
 
+  // ─── Saved Searches ──────────────────────────────────────────────────────
+  sl.registerFactory(() => SavedSearchesBloc(
+        getSavedSearches: sl(),
+        saveSavedSearch: sl(),
+        removeSavedSearch: sl(),
+      ));
+  sl.registerLazySingleton(() => GetSavedSearches(sl()));
+  sl.registerLazySingleton(() => SaveSavedSearch(sl()));
+  sl.registerLazySingleton(() => RemoveSavedSearch(sl()));
+  sl.registerLazySingleton<SavedSearchesRepository>(
+    () => SavedSearchesRepositoryImpl(
+      remoteDataSource: sl(),
+      localDataSource: sl(),
+    ),
+  );
+  sl.registerLazySingleton<SavedSearchesRemoteDataSource>(
+    () => SavedSearchesRemoteDataSourceImpl(dio: sl()),
+  );
+  sl.registerLazySingleton<SavedSearchesLocalDataSource>(
+    () => SavedSearchesLocalDataSourceImpl(sharedPreferences: sl()),
+  );
+
   // ─── Home ─────────────────────────────────────────────────────────────────
   sl.registerFactory(() => HomeBloc(
         getFeaturedListings: sl(),
@@ -155,6 +250,129 @@ Future<void> init() async {
   );
   sl.registerLazySingleton<HomeRemoteDataSource>(
     () => HomeRemoteDataSourceImpl(dio: sl()),
+  );
+
+  // ─── Property Details ────────────────────────────────────────────────────
+  sl.registerFactory(() => PropertyDetailsBloc(repository: sl()));
+  sl.registerLazySingleton<PropertyDetailsRepository>(
+    () => PropertyDetailsRepositoryImpl(
+      localDataSource: sl(),
+      remoteDataSource: sl(),
+    ),
+  );
+  sl.registerLazySingleton<PropertyDetailsLocalDataSource>(
+    () => PropertyDetailsLocalDataSourceImpl(),
+  );
+  sl.registerLazySingleton<PropertyDetailsRemoteDataSource>(
+    () => PropertyDetailsRemoteDataSourceImpl(dio: sl()),
+  );
+
+  // ─── Reviews ────────────────────────────────────────────────────────────
+  sl.registerFactory(() => ReviewsBloc(
+        getPropertyReviews: sl(),
+        submitReview: sl(),
+      ));
+  sl.registerLazySingleton(() => GetPropertyReviews(sl()));
+  sl.registerLazySingleton(() => SubmitReview(sl()));
+  sl.registerLazySingleton<ReviewsRepository>(
+    () => ReviewsRepositoryImpl(remoteDataSource: sl()),
+  );
+  sl.registerLazySingleton<ReviewsRemoteDataSource>(
+    () => ReviewsRemoteDataSourceImpl(dio: sl()),
+  );
+
+  // ─── Schedule Visit ─────────────────────────────────────────────────────
+  sl.registerFactory(() => ScheduleVisitBloc(scheduleVisit: sl()));
+  sl.registerLazySingleton(() => ScheduleVisit(sl()));
+  sl.registerLazySingleton<ScheduleVisitRepository>(
+    () => ScheduleVisitRepositoryImpl(remoteDataSource: sl()),
+  );
+  sl.registerLazySingleton<ScheduleVisitRemoteDataSource>(
+    () => ScheduleVisitRemoteDataSourceImpl(dio: sl()),
+  );
+
+  // ─── Maintenance Requests ────────────────────────────────────────────────
+  sl.registerFactory(() => MaintenanceRequestsBloc(
+        getMaintenanceHistory: sl(),
+        raiseMaintenanceRequest: sl(),
+      ));
+  sl.registerLazySingleton(() => GetMaintenanceHistory(sl()));
+  sl.registerLazySingleton(() => RaiseMaintenanceRequest(sl()));
+  sl.registerLazySingleton<MaintenanceRepository>(
+    () => MaintenanceRepositoryImpl(
+      remoteDataSource: sl(),
+      localDataSource: sl(),
+    ),
+  );
+  sl.registerLazySingleton<MaintenanceRemoteDataSource>(
+    () => MaintenanceRemoteDataSourceImpl(dio: sl()),
+  );
+  sl.registerLazySingleton<MaintenanceLocalDataSource>(
+    () => MaintenanceLocalDataSourceImpl(),
+  );
+
+  // ─── Rent Receipts ───────────────────────────────────────────────────────
+  sl.registerFactory(() => RentReceiptsBloc(
+        getRentReceipts: sl(),
+        downloadRentReceipt: sl(),
+      ));
+  sl.registerLazySingleton(() => GetRentReceipts(sl()));
+  sl.registerLazySingleton(() => DownloadRentReceipt(sl()));
+  sl.registerLazySingleton<RentReceiptsRepository>(
+    () => RentReceiptsRepositoryImpl(
+      remoteDataSource: sl(),
+      localDataSource: sl(),
+    ),
+  );
+  sl.registerLazySingleton<RentReceiptsRemoteDataSource>(
+    () => RentReceiptsRemoteDataSourceImpl(dio: sl()),
+  );
+  sl.registerLazySingleton<RentReceiptsLocalDataSource>(
+    () => RentReceiptsLocalDataSourceImpl(),
+  );
+
+  // ─── Saved Listings ─────────────────────────────────────────────────────
+  sl.registerFactory(() => SavedListingsBloc(
+        getSavedListings: sl(),
+        removeSavedListing: sl(),
+      ));
+  sl.registerLazySingleton(() => GetSavedListings(sl()));
+  sl.registerLazySingleton(() => RemoveSavedListing(sl()));
+  sl.registerLazySingleton<SavedListingsRepository>(
+    () => SavedListingsRepositoryImpl(
+      remoteDataSource: sl(),
+      localDataSource: sl(),
+    ),
+  );
+  sl.registerLazySingleton<SavedListingsRemoteDataSource>(
+    () => SavedListingsRemoteDataSourceImpl(dio: sl()),
+  );
+  sl.registerLazySingleton<SavedListingsLocalDataSource>(
+    () => SavedListingsLocalDataSourceImpl(),
+  );
+
+  // ─── Profile ─────────────────────────────────────────────────────────────
+  sl.registerFactory(() => ProfileBloc(
+        getProfile: sl(),
+        updateProfile: sl(),
+        submitKycDocuments: sl(),
+        getSiteVisits: sl(),
+      ));
+  sl.registerLazySingleton(() => GetProfile(sl()));
+  sl.registerLazySingleton(() => UpdateProfile(sl()));
+  sl.registerLazySingleton(() => SubmitKycDocuments(sl()));
+  sl.registerLazySingleton(() => GetSiteVisits(sl()));
+  sl.registerLazySingleton<ProfileRepository>(
+    () => ProfileRepositoryImpl(
+      remoteDataSource: sl(),
+      localDataSource: sl(),
+    ),
+  );
+  sl.registerLazySingleton<ProfileRemoteDataSource>(
+    () => ProfileRemoteDataSourceImpl(dio: sl()),
+  );
+  sl.registerLazySingleton<ProfileLocalDataSource>(
+    () => ProfileLocalDataSourceImpl(),
   );
 
   // ─── Role Selection ───────────────────────────────────────────────────────
@@ -187,6 +405,9 @@ Future<void> init() async {
   sl.registerLazySingleton<OtpRemoteDataSource>(
     () => OtpRemoteDataSourceImpl(dio: sl()),
   );
+
+  // ─── Theme ────────────────────────────────────────────────────────────────
+  sl.registerLazySingleton(() => ThemeCubit(sharedPreferences: sl()));
 
   // ─── Feature Selection ────────────────────────────────────────────────────
   sl.registerFactory(() => FeatureSelectionBloc(

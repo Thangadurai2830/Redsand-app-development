@@ -34,8 +34,10 @@ class SearchResultLoaded extends SearchResultState {
     switch (filter.sortBy) {
       case 'price_asc':
         list.sort((a, b) => a.price.compareTo(b.price));
+        break;
       case 'price_desc':
         list.sort((a, b) => b.price.compareTo(a.price));
+        break;
       default:
         break;
     }

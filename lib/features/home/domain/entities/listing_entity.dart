@@ -13,6 +13,7 @@ class ListingEntity extends Equatable {
   final bool isBoosted;
   final int bedrooms;
   final double areaSqft;
+  final List<String> amenities;
 
   const ListingEntity({
     required this.id,
@@ -27,11 +28,12 @@ class ListingEntity extends Equatable {
     required this.isBoosted,
     required this.bedrooms,
     required this.areaSqft,
+    this.amenities = const [],
   });
 
   @override
   List<Object?> get props => [
         id, title, locality, city, price, type,
-        listingFor, imageUrl, isPremium, isBoosted, bedrooms, areaSqft,
+        listingFor, imageUrl, isPremium, isBoosted, bedrooms, areaSqft, amenities,
       ];
 }

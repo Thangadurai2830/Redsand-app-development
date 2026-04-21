@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/di/injection_container.dart' as di;
-import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/theme_cubit.dart';
 import '../../domain/entities/app_feature.dart';
 import '../bloc/feature_selection_bloc.dart';
 
@@ -22,11 +22,10 @@ class _FeatureSelectionView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Scaffold(
       appBar: AppBar(
         title: const Text('Feature Selection'),
-        backgroundColor: AppColors.deepRoyalPurple,
-        foregroundColor: Colors.white,
         actions: [
           BlocBuilder<FeatureSelectionBloc, FeatureSelectionState>(
             builder: (context, state) {
@@ -37,14 +36,16 @@ class _FeatureSelectionView extends StatelessWidget {
                         child: SizedBox(
                           width: 20,
                           height: 20,
-                          child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                          child: CircularProgressIndicator(
+                              color: Colors.white, strokeWidth: 2),
                         ),
                       )
                     : IconButton(
                         icon: const Icon(Icons.save_rounded),
                         tooltip: 'Save',
-                        onPressed: () =>
-                            context.read<FeatureSelectionBloc>().add(const SaveFeaturesEvent()),
+                        onPressed: () => context
+                            .read<FeatureSelectionBloc>()
+                            .add(const SaveFeaturesEvent()),
                       );
               }
               return const SizedBox.shrink();
@@ -54,22 +55,32 @@ class _FeatureSelectionView extends StatelessWidget {
       ),
       body: BlocConsumer<FeatureSelectionBloc, FeatureSelectionState>(
         listener: (context, state) {
-          if (state is FeatureSelectionLoaded && state.savedSuccess) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Features saved successfully'),
-                backgroundColor: Colors.green,
-              ),
-            );
+          if (state is FeatureSelectionLoaded) {
+            final darkFeature =
+                state.features.where((f) => f.id == 'dark_mode').firstOrNull;
+            if (darkFeature != null) {
+              context.read<ThemeCubit>().setDarkMode(darkFeature.isEnabled);
+            }
+            if (state.savedSuccess) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: const Text('Features saved successfully'),
+                  backgroundColor: colorScheme.primary,
+                ),
+              );
+            }
           }
           if (state is FeatureSelectionError) {
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(state.message), backgroundColor: Colors.red),
+              SnackBar(
+                  content: Text(state.message),
+                  backgroundColor: colorScheme.error),
             );
           }
         },
         builder: (context, state) {
-          if (state is FeatureSelectionLoading || state is FeatureSelectionInitial) {
+          if (state is FeatureSelectionLoading ||
+              state is FeatureSelectionInitial) {
             return const Center(child: CircularProgressIndicator());
           }
           if (state is FeatureSelectionError) {
@@ -77,13 +88,15 @@ class _FeatureSelectionView extends StatelessWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Icon(Icons.error_outline, size: 48, color: Colors.red),
+                  Icon(Icons.error_outline,
+                      size: 48, color: colorScheme.error),
                   const SizedBox(height: 16),
                   Text(state.message),
                   const SizedBox(height: 16),
                   ElevatedButton(
-                    onPressed: () =>
-                        context.read<FeatureSelectionBloc>().add(const LoadFeatures()),
+                    onPressed: () => context
+                        .read<FeatureSelectionBloc>()
+                        .add(const LoadFeatures()),
                     child: const Text('Retry'),
                   ),
                 ],
@@ -143,6 +156,8 @@ class _CategorySection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -150,15 +165,15 @@ class _CategorySection extends StatelessWidget {
           padding: const EdgeInsets.fromLTRB(16, 16, 16, 4),
           child: Row(
             children: [
-              Icon(_categoryIcon, size: 18, color: AppColors.deepRoyalPurple),
+              Icon(_categoryIcon, size: 18, color: colorScheme.primary),
               const SizedBox(width: 8),
               Text(
                 _categoryLabel,
-                style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                      color: AppColors.deepRoyalPurple,
-                      fontWeight: FontWeight.w700,
-                      letterSpacing: 0.5,
-                    ),
+                style: textTheme.titleSmall?.copyWith(
+                  color: colorScheme.primary,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: 0.5,
+                ),
               ),
             ],
           ),
@@ -177,6 +192,8 @@ class _FeatureTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
     return SwitchListTile(
       value: feature.isEnabled,
       onChanged: (value) {
@@ -192,15 +209,15 @@ class _FeatureTile extends StatelessWidget {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
               decoration: BoxDecoration(
-                color: AppColors.deepRoyalPurple.withOpacity(0.12),
+                color: colorScheme.primary.withOpacity(0.15),
                 borderRadius: BorderRadius.circular(4),
               ),
               child: Text(
                 'Admin',
-                style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                      color: AppColors.deepRoyalPurple,
-                      fontWeight: FontWeight.w600,
-                    ),
+                style: textTheme.labelSmall?.copyWith(
+                  color: colorScheme.primary,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
             ),
           ],
@@ -208,9 +225,12 @@ class _FeatureTile extends StatelessWidget {
       ),
       subtitle: Text(
         feature.description,
-        style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Colors.grey[600]),
+        style: textTheme.bodySmall?.copyWith(
+          color: colorScheme.onSurfaceVariant,
+        ),
       ),
-      activeColor: AppColors.deepRoyalPurple,
+      activeColor: colorScheme.primary,
+      activeTrackColor: colorScheme.primary.withOpacity(0.4),
     );
   }
 }

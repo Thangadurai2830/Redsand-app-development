@@ -5,6 +5,7 @@ import '../../../filter/domain/entities/filter_entity.dart';
 import '../../../search_result/presentation/pages/search_result_page.dart';
 import '../../domain/entities/listing_entity.dart';
 import '../../domain/entities/search_suggestion_entity.dart';
+import '../../../property_details/presentation/pages/property_details_page.dart';
 import '../bloc/home_bloc.dart';
 import '../bloc/home_event.dart';
 import '../bloc/home_state.dart';
@@ -364,118 +365,125 @@ class _FeaturedCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: 200,
-      decoration: BoxDecoration(
-        color: AppColors.white,
-        borderRadius: BorderRadius.circular(14),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.06),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
+    return GestureDetector(
+      onTap: () => Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (_) => PropertyDetailsPage(listing: listing),
+        ),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Stack(
-            children: [
-              Container(
-                height: 120,
-                decoration: const BoxDecoration(
-                  color: AppColors.veryLightPurpleBg,
-                  borderRadius: BorderRadius.vertical(top: Radius.circular(14)),
-                ),
-                child: const Center(
-                  child: Icon(
-                    Icons.home,
-                    size: 48,
-                    color: AppColors.lightLavender,
-                  ),
-                ),
-              ),
-              if (listing.isPremium)
-                Positioned(
-                  top: 8,
-                  left: 8,
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                    decoration: BoxDecoration(
-                      color: AppColors.mainPurple,
-                      borderRadius: BorderRadius.circular(6),
-                    ),
-                    child: const Text(
-                      'Premium',
-                      style: TextStyle(
-                        color: AppColors.white,
-                        fontSize: 10,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                ),
-              if (listing.isBoosted)
-                Positioned(
-                  top: 8,
-                  right: 8,
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                    decoration: BoxDecoration(
-                      color: AppColors.mintGreen,
-                      borderRadius: BorderRadius.circular(6),
-                    ),
-                    child: const Text(
-                      'Boosted',
-                      style: TextStyle(
-                        color: AppColors.white,
-                        fontSize: 10,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                ),
-            ],
-          ),
-          Padding(
-            padding: const EdgeInsets.all(10),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+      child: Container(
+        width: 200,
+        decoration: BoxDecoration(
+          color: AppColors.white,
+          borderRadius: BorderRadius.circular(14),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.06),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Stack(
               children: [
-                Text(
-                  listing.title,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.w600,
-                    fontSize: 13,
-                    color: AppColors.primaryDarkText,
+                Container(
+                  height: 120,
+                  decoration: const BoxDecoration(
+                    color: AppColors.veryLightPurpleBg,
+                    borderRadius: BorderRadius.vertical(top: Radius.circular(14)),
                   ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  '${listing.locality}, ${listing.city}',
-                  style: const TextStyle(
-                    fontSize: 11,
-                    color: AppColors.secondaryGrayText,
+                  child: const Center(
+                    child: Icon(
+                      Icons.home,
+                      size: 48,
+                      color: AppColors.lightLavender,
+                    ),
                   ),
                 ),
-                const SizedBox(height: 6),
-                Text(
-                  listing.listingFor == 'rent'
-                      ? '₹${listing.price.toInt()}/mo'
-                      : '₹${(listing.price / 100000).toStringAsFixed(1)}L',
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 14,
-                    color: AppColors.mainPurple,
+                if (listing.isPremium)
+                  Positioned(
+                    top: 8,
+                    left: 8,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                      decoration: BoxDecoration(
+                        color: AppColors.mainPurple,
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: const Text(
+                        'Premium',
+                        style: TextStyle(
+                          color: AppColors.white,
+                          fontSize: 10,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
                   ),
-                ),
+                if (listing.isBoosted)
+                  Positioned(
+                    top: 8,
+                    right: 8,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                      decoration: BoxDecoration(
+                        color: AppColors.mintGreen,
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: const Text(
+                        'Boosted',
+                        style: TextStyle(
+                          color: AppColors.white,
+                          fontSize: 10,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ),
               ],
             ),
-          ),
-        ],
+            Padding(
+              padding: const EdgeInsets.all(10),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    listing.title,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 13,
+                      color: AppColors.primaryDarkText,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    '${listing.locality}, ${listing.city}',
+                    style: const TextStyle(
+                      fontSize: 11,
+                      color: AppColors.secondaryGrayText,
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    listing.listingFor == 'rent'
+                        ? '₹${listing.price.toInt()}/mo'
+                        : '₹${(listing.price / 100000).toStringAsFixed(1)}L',
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14,
+                      color: AppColors.mainPurple,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -487,134 +495,141 @@ class _RecommendedCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: AppColors.white,
-        borderRadius: BorderRadius.circular(14),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.06),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
+    return GestureDetector(
+      onTap: () => Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (_) => PropertyDetailsPage(listing: listing),
+        ),
       ),
-      child: Row(
-        children: [
-          Container(
-            width: 90,
-            height: 90,
-            decoration: const BoxDecoration(
-              color: AppColors.veryLightPurpleBg,
-              borderRadius: BorderRadius.horizontal(left: Radius.circular(14)),
+      child: Container(
+        decoration: BoxDecoration(
+          color: AppColors.white,
+          borderRadius: BorderRadius.circular(14),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.06),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
             ),
-            child: const Center(
-              child: Icon(
-                Icons.home,
-                size: 36,
-                color: AppColors.lightLavender,
+          ],
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 90,
+              height: 90,
+              decoration: const BoxDecoration(
+                color: AppColors.veryLightPurpleBg,
+                borderRadius: BorderRadius.horizontal(left: Radius.circular(14)),
+              ),
+              child: const Center(
+                child: Icon(
+                  Icons.home,
+                  size: 36,
+                  color: AppColors.lightLavender,
+                ),
               ),
             ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 12),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Text(
-                          listing.title,
-                          style: const TextStyle(
-                            fontWeight: FontWeight.w600,
-                            fontSize: 14,
-                            color: AppColors.primaryDarkText,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                      if (listing.isPremium)
-                        Container(
-                          margin: const EdgeInsets.only(right: 12),
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 6,
-                            vertical: 2,
-                          ),
-                          decoration: BoxDecoration(
-                            color: AppColors.veryLightPurpleBg,
-                            borderRadius: BorderRadius.circular(4),
-                          ),
-                          child: const Text(
-                            'Premium',
-                            style: TextStyle(
-                              color: AppColors.mainPurple,
-                              fontSize: 10,
+            const SizedBox(width: 12),
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            listing.title,
+                            style: const TextStyle(
                               fontWeight: FontWeight.w600,
+                              fontSize: 14,
+                              color: AppColors.primaryDarkText,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        if (listing.isPremium)
+                          Container(
+                            margin: const EdgeInsets.only(right: 12),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 6,
+                              vertical: 2,
+                            ),
+                            decoration: BoxDecoration(
+                              color: AppColors.veryLightPurpleBg,
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                            child: const Text(
+                              'Premium',
+                              style: TextStyle(
+                                color: AppColors.mainPurple,
+                                fontSize: 10,
+                                fontWeight: FontWeight.w600,
+                              ),
                             ),
                           ),
-                        ),
-                    ],
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    '${listing.locality}, ${listing.city}',
-                    style: const TextStyle(
-                      fontSize: 12,
-                      color: AppColors.secondaryGrayText,
+                      ],
                     ),
-                  ),
-                  const SizedBox(height: 4),
-                  Row(
-                    children: [
-                      const Icon(
-                        Icons.king_bed_outlined,
-                        size: 14,
+                    const SizedBox(height: 4),
+                    Text(
+                      '${listing.locality}, ${listing.city}',
+                      style: const TextStyle(
+                        fontSize: 12,
                         color: AppColors.secondaryGrayText,
                       ),
-                      const SizedBox(width: 3),
-                      Text(
-                        '${listing.bedrooms} BHK',
-                        style: const TextStyle(
-                          fontSize: 12,
-                          color: AppColors.secondaryGrayText,
-                        ),
-                      ),
-                      const SizedBox(width: 10),
-                      const Icon(
-                        Icons.square_foot,
-                        size: 14,
-                        color: AppColors.secondaryGrayText,
-                      ),
-                      const SizedBox(width: 3),
-                      Text(
-                        '${listing.areaSqft.toInt()} sqft',
-                        style: const TextStyle(
-                          fontSize: 12,
-                          color: AppColors.secondaryGrayText,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 6),
-                  Text(
-                    listing.listingFor == 'rent'
-                        ? '₹${listing.price.toInt()}/mo'
-                        : '₹${(listing.price / 100000).toStringAsFixed(1)}L',
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 15,
-                      color: AppColors.mainPurple,
                     ),
-                  ),
-                ],
+                    const SizedBox(height: 4),
+                    Row(
+                      children: [
+                        const Icon(
+                          Icons.king_bed_outlined,
+                          size: 14,
+                          color: AppColors.secondaryGrayText,
+                        ),
+                        const SizedBox(width: 3),
+                        Text(
+                          '${listing.bedrooms} BHK',
+                          style: const TextStyle(
+                            fontSize: 12,
+                            color: AppColors.secondaryGrayText,
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+                        const Icon(
+                          Icons.square_foot,
+                          size: 14,
+                          color: AppColors.secondaryGrayText,
+                        ),
+                        const SizedBox(width: 3),
+                        Text(
+                          '${listing.areaSqft.toInt()} sqft',
+                          style: const TextStyle(
+                            fontSize: 12,
+                            color: AppColors.secondaryGrayText,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      listing.listingFor == 'rent'
+                          ? '₹${listing.price.toInt()}/mo'
+                          : '₹${(listing.price / 100000).toStringAsFixed(1)}L',
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 15,
+                        color: AppColors.mainPurple,
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

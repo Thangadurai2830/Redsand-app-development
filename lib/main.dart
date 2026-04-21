@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'core/di/injection_container.dart' as di;
 import 'core/theme/app_theme.dart';
+import 'core/theme/theme_cubit.dart';
 import 'features/splash/presentation/bloc/splash_bloc.dart';
 import 'features/splash/presentation/pages/splash_page.dart';
 
@@ -16,13 +17,22 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter App',
-      debugShowCheckedModeBanner: false,
-      theme: AppTheme.lightTheme,
-      home: BlocProvider(
-        create: (_) => di.sl<SplashBloc>(),
-        child: const SplashPage(),
+    return BlocProvider<ThemeCubit>(
+      create: (_) => di.sl<ThemeCubit>(),
+      child: BlocBuilder<ThemeCubit, bool>(
+        builder: (context, isDark) {
+          return MaterialApp(
+            title: 'Flutter App',
+            debugShowCheckedModeBanner: false,
+            theme: AppTheme.lightTheme,
+            darkTheme: AppTheme.darkTheme,
+            themeMode: isDark ? ThemeMode.dark : ThemeMode.light,
+            home: BlocProvider(
+              create: (_) => di.sl<SplashBloc>(),
+              child: const SplashPage(),
+            ),
+          );
+        },
       ),
     );
   }

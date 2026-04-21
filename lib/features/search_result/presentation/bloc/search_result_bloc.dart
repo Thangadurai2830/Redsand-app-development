@@ -1,4 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../home/domain/entities/search_params.dart';
 import '../../../home/domain/usecases/get_home_data.dart';
 import 'search_result_event.dart';
 import 'search_result_state.dart';
@@ -17,7 +18,11 @@ class SearchResultBloc extends Bloc<SearchResultEvent, SearchResultState> {
   Future<void> _onLoad(SearchResultLoad event, Emitter<SearchResultState> emit) async {
     emit(const SearchResultLoading());
     final result = await searchListings(
-      SearchParams(query: event.query, listingFor: event.filter.listingFor),
+      SearchParams(
+        query: event.query,
+        listingFor: event.filter.listingFor,
+        filter: event.filter,
+      ),
     );
     result.fold(
       (_) => emit(const SearchResultError('Failed to load results')),
@@ -25,6 +30,14 @@ class SearchResultBloc extends Bloc<SearchResultEvent, SearchResultState> {
         var filtered = listings;
         if (event.filter.propertyType != null) {
           filtered = filtered.where((l) => l.type == event.filter.propertyType).toList();
+        }
+        if (event.filter.city != null && event.filter.city!.trim().isNotEmpty) {
+          final city = event.filter.city!.trim().toLowerCase();
+          filtered = filtered.where((l) => l.city.toLowerCase() == city).toList();
+        }
+        if (event.filter.locality != null && event.filter.locality!.trim().isNotEmpty) {
+          final locality = event.filter.locality!.trim().toLowerCase();
+          filtered = filtered.where((l) => l.locality.toLowerCase().contains(locality)).toList();
         }
         if (event.filter.minPrice != null) {
           filtered = filtered.where((l) => l.price >= event.filter.minPrice!).toList();

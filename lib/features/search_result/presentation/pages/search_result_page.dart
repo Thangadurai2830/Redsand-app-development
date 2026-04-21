@@ -5,6 +5,11 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../filter/domain/entities/filter_entity.dart';
 import '../../../filter/presentation/pages/filter_page.dart';
 import '../../../home/domain/entities/listing_entity.dart';
+import '../../../property_details/presentation/pages/property_details_page.dart';
+import '../../../saved_searches/presentation/bloc/saved_searches_bloc.dart';
+import '../../../saved_searches/presentation/bloc/saved_searches_event.dart';
+import '../../../saved_searches/presentation/bloc/saved_searches_state.dart';
+import '../../../saved_searches/presentation/widgets/saved_search_save_sheet.dart';
 import '../../presentation/bloc/search_result_bloc.dart';
 import '../../presentation/bloc/search_result_event.dart';
 import '../../presentation/bloc/search_result_state.dart';
@@ -22,38 +27,59 @@ class SearchResultPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) => sl<SearchResultBloc>()
-        ..add(SearchResultLoad(query: query, filter: initialFilter)),
-      child: _SearchResultView(query: query),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(
+          create: (_) => sl<SearchResultBloc>()
+            ..add(SearchResultLoad(query: query, filter: initialFilter)),
+        ),
+        BlocProvider(create: (_) => sl<SavedSearchesBloc>()),
+      ],
+      child: _SearchResultView(query: query, initialFilter: initialFilter),
     );
   }
 }
 
 class _SearchResultView extends StatelessWidget {
   final String query;
-  const _SearchResultView({required this.query});
+  final FilterEntity initialFilter;
+
+  const _SearchResultView({
+    required this.query,
+    required this.initialFilter,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.lightGrayBg,
-      appBar: _buildAppBar(context),
-      body: BlocBuilder<SearchResultBloc, SearchResultState>(
-        builder: (context, state) {
-          if (state is SearchResultLoading) {
-            return const Center(
-              child: CircularProgressIndicator(color: AppColors.mainPurple),
-            );
-          }
-          if (state is SearchResultError) {
-            return _ErrorView(message: state.message);
-          }
-          if (state is SearchResultLoaded) {
-            return _LoadedView(state: state);
-          }
-          return const SizedBox.shrink();
-        },
+    return BlocListener<SavedSearchesBloc, SavedSearchesState>(
+      listenWhen: (previous, current) => previous.message != current.message && current.message != null,
+      listener: (context, state) {
+        if (state.message != null) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(state.message!)),
+          );
+          context.read<SavedSearchesBloc>().add(const SavedSearchesClearMessageRequested());
+        }
+      },
+      child: Scaffold(
+        backgroundColor: AppColors.lightGrayBg,
+        appBar: _buildAppBar(context),
+        body: BlocBuilder<SearchResultBloc, SearchResultState>(
+          builder: (context, state) {
+            if (state is SearchResultLoading) {
+              return const Center(
+                child: CircularProgressIndicator(color: AppColors.mainPurple),
+              );
+            }
+            if (state is SearchResultError) {
+              return _ErrorView(message: state.message);
+            }
+            if (state is SearchResultLoaded) {
+              return _LoadedView(state: state);
+            }
+            return const SizedBox.shrink();
+          },
+        ),
       ),
     );
   }
@@ -124,6 +150,10 @@ class _SearchResultView extends StatelessWidget {
           },
         ),
         IconButton(
+          icon: const Icon(Icons.notifications_active_outlined, color: AppColors.primaryDarkText),
+          onPressed: () => _openSaveSheet(context),
+        ),
+        IconButton(
           icon: const Icon(Icons.map_outlined, color: AppColors.primaryDarkText),
           onPressed: () => _openMap(context),
         ),
@@ -150,6 +180,20 @@ class _SearchResultView extends StatelessWidget {
       MaterialPageRoute(builder: (_) => MapPage(listings: listings)),
     );
   }
+
+  void _openSaveSheet(BuildContext context) {
+    final currentState = context.read<SearchResultBloc>().state;
+    final currentFilter = currentState is SearchResultLoaded ? currentState.filter : initialFilter;
+    showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) => SavedSearchSaveSheet(
+        query: query,
+        filter: currentFilter,
+      ),
+    );
+  }
 }
 
 class _LoadedView extends StatelessWidget {
@@ -173,6 +217,11 @@ class _LoadedView extends StatelessWidget {
               itemBuilder: (context, index) => _PropertyCard(
                 listing: listings[index],
                 isSaved: state.savedIds.contains(listings[index].id),
+                onTap: () => Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => PropertyDetailsPage(listing: listings[index]),
+                  ),
+                ),
               ),
             ),
           ),
@@ -293,8 +342,13 @@ class _SortBar extends StatelessWidget {
 class _PropertyCard extends StatelessWidget {
   final ListingEntity listing;
   final bool isSaved;
+  final VoidCallback onTap;
 
-  const _PropertyCard({required this.listing, required this.isSaved});
+  const _PropertyCard({
+    required this.listing,
+    required this.isSaved,
+    required this.onTap,
+  });
 
   String _formatPrice() {
     if (listing.listingFor == 'rent') {
@@ -332,25 +386,28 @@ class _PropertyCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      decoration: BoxDecoration(
-        color: AppColors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 3),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _buildImage(context),
-          _buildDetails(),
-        ],
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 12),
+        decoration: BoxDecoration(
+          color: AppColors.white,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 10,
+              offset: const Offset(0, 3),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildImage(context),
+            _buildDetails(),
+          ],
+        ),
       ),
     );
   }
@@ -371,10 +428,10 @@ class _PropertyCard extends StatelessWidget {
               : _placeholderImage(),
         ),
         if (listing.isPremium)
-          Positioned(
+          const Positioned(
             top: 12,
             left: 12,
-            child: const _Badge(label: 'Premium', color: AppColors.mainPurple),
+            child: _Badge(label: 'Premium', color: AppColors.mainPurple),
           ),
         if (listing.isBoosted)
           Positioned(

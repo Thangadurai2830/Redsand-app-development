@@ -3,6 +3,7 @@ import 'package:equatable/equatable.dart';
 import '../../../../core/error/failures.dart';
 import '../../../../core/usecases/usecase.dart';
 import '../entities/listing_entity.dart';
+import '../entities/search_params.dart';
 import '../entities/search_suggestion_entity.dart';
 import '../repositories/home_repository.dart';
 
@@ -32,7 +33,7 @@ class SearchListings implements UseCase<List<ListingEntity>, SearchParams> {
 
   @override
   Future<Either<Failure, List<ListingEntity>>> call(SearchParams params) {
-    return repository.searchListings(params.query, params.listingFor);
+    return repository.searchListings(params);
   }
 }
 
@@ -54,14 +55,6 @@ class ListingParams extends Equatable {
   List<Object?> get props => [listingFor];
 }
 
-class SearchParams extends Equatable {
-  final String query;
-  final String listingFor;
-  const SearchParams({required this.query, required this.listingFor});
-
-  @override
-  List<Object?> get props => [query, listingFor];
-}
 
 class SuggestionParams extends Equatable {
   final String query;
