@@ -19,6 +19,7 @@ dependencies:
   shared_preferences: ^2.2.3
   dio: ^5.4.3
   smooth_page_indicator: ^1.1.0
+  cached_network_image: ^3.3.1
 
 dev_dependencies:
   flutter_test:

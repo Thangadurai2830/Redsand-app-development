@@ -56,6 +56,7 @@ class HomeRepositoryImpl implements HomeRepository {
         final results = await localDataSource.searchListings(
           params.query,
           params.listingFor,
+          filter: params.filter,
         );
         return Right(results);
       } catch (_) {

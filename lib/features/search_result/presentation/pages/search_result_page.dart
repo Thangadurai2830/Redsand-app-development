@@ -184,13 +184,17 @@ class _SearchResultView extends StatelessWidget {
   void _openSaveSheet(BuildContext context) {
     final currentState = context.read<SearchResultBloc>().state;
     final currentFilter = currentState is SearchResultLoaded ? currentState.filter : initialFilter;
+    final savedSearchesBloc = context.read<SavedSearchesBloc>();
     showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (_) => SavedSearchSaveSheet(
-        query: query,
-        filter: currentFilter,
+      builder: (_) => BlocProvider.value(
+        value: savedSearchesBloc,
+        child: SavedSearchSaveSheet(
+          query: query,
+          filter: currentFilter,
+        ),
       ),
     );
   }

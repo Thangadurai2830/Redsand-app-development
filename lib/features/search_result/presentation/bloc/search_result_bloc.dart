@@ -26,34 +26,11 @@ class SearchResultBloc extends Bloc<SearchResultEvent, SearchResultState> {
     );
     result.fold(
       (_) => emit(const SearchResultError('Failed to load results')),
-      (listings) {
-        var filtered = listings;
-        if (event.filter.propertyType != null) {
-          filtered = filtered.where((l) => l.type == event.filter.propertyType).toList();
-        }
-        if (event.filter.city != null && event.filter.city!.trim().isNotEmpty) {
-          final city = event.filter.city!.trim().toLowerCase();
-          filtered = filtered.where((l) => l.city.toLowerCase() == city).toList();
-        }
-        if (event.filter.locality != null && event.filter.locality!.trim().isNotEmpty) {
-          final locality = event.filter.locality!.trim().toLowerCase();
-          filtered = filtered.where((l) => l.locality.toLowerCase().contains(locality)).toList();
-        }
-        if (event.filter.minPrice != null) {
-          filtered = filtered.where((l) => l.price >= event.filter.minPrice!).toList();
-        }
-        if (event.filter.maxPrice != null) {
-          filtered = filtered.where((l) => l.price <= event.filter.maxPrice!).toList();
-        }
-        if (event.filter.minBedrooms != null) {
-          filtered = filtered.where((l) => l.bedrooms >= event.filter.minBedrooms!).toList();
-        }
-        emit(SearchResultLoaded(
-          listings: filtered,
-          query: event.query,
-          filter: event.filter,
-        ));
-      },
+      (listings) => emit(SearchResultLoaded(
+        listings: listings,
+        query: event.query,
+        filter: event.filter,
+      )),
     );
   }
 

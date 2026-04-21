@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/theme/app_colors.dart';
@@ -359,6 +360,13 @@ class _HomePageState extends State<HomePage> {
   }
 }
 
+Widget _imagePlaceholder(double height) => Container(
+      height: height,
+      width: double.infinity,
+      color: AppColors.veryLightPurpleBg,
+      child: Icon(Icons.home, size: height * 0.4, color: AppColors.lightLavender),
+    );
+
 class _FeaturedCard extends StatelessWidget {
   final ListingEntity listing;
   const _FeaturedCard({required this.listing});
@@ -389,19 +397,18 @@ class _FeaturedCard extends StatelessWidget {
           children: [
             Stack(
               children: [
-                Container(
-                  height: 120,
-                  decoration: const BoxDecoration(
-                    color: AppColors.veryLightPurpleBg,
-                    borderRadius: BorderRadius.vertical(top: Radius.circular(14)),
-                  ),
-                  child: const Center(
-                    child: Icon(
-                      Icons.home,
-                      size: 48,
-                      color: AppColors.lightLavender,
-                    ),
-                  ),
+                ClipRRect(
+                  borderRadius: const BorderRadius.vertical(top: Radius.circular(14)),
+                  child: listing.imageUrl.isNotEmpty
+                      ? CachedNetworkImage(
+                          imageUrl: listing.imageUrl,
+                          height: 120,
+                          width: double.infinity,
+                          fit: BoxFit.cover,
+                          placeholder: (_, __) => _imagePlaceholder(120),
+                          errorWidget: (_, __, ___) => _imagePlaceholder(120),
+                        )
+                      : _imagePlaceholder(120),
                 ),
                 if (listing.isPremium)
                   Positioned(
@@ -515,20 +522,18 @@ class _RecommendedCard extends StatelessWidget {
         ),
         child: Row(
           children: [
-            Container(
-              width: 90,
-              height: 90,
-              decoration: const BoxDecoration(
-                color: AppColors.veryLightPurpleBg,
-                borderRadius: BorderRadius.horizontal(left: Radius.circular(14)),
-              ),
-              child: const Center(
-                child: Icon(
-                  Icons.home,
-                  size: 36,
-                  color: AppColors.lightLavender,
-                ),
-              ),
+            ClipRRect(
+              borderRadius: const BorderRadius.horizontal(left: Radius.circular(14)),
+              child: listing.imageUrl.isNotEmpty
+                  ? CachedNetworkImage(
+                      imageUrl: listing.imageUrl,
+                      width: 90,
+                      height: 90,
+                      fit: BoxFit.cover,
+                      placeholder: (_, __) => _imagePlaceholder(90),
+                      errorWidget: (_, __, ___) => _imagePlaceholder(90),
+                    )
+                  : SizedBox(width: 90, height: 90, child: _imagePlaceholder(90)),
             ),
             const SizedBox(width: 12),
             Expanded(

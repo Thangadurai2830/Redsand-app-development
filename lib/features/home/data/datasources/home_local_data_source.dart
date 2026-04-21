@@ -1,9 +1,10 @@
+import '../../../filter/domain/entities/filter_entity.dart';
 import '../models/home_model.dart';
 
 abstract class HomeLocalDataSource {
   Future<List<ListingModel>> getFeaturedListings(String listingFor);
   Future<List<ListingModel>> getRecommendedListings(String listingFor);
-  Future<List<ListingModel>> searchListings(String query, String listingFor);
+  Future<List<ListingModel>> searchListings(String query, String listingFor, {FilterEntity? filter});
   Future<List<SearchSuggestionModel>> getSearchSuggestions(String query);
 }
 
@@ -19,15 +20,29 @@ class HomeLocalDataSourceImpl implements HomeLocalDataSource {
   }
 
   @override
-  Future<List<ListingModel>> searchListings(String query, String listingFor) async {
+  Future<List<ListingModel>> searchListings(String query, String listingFor, {FilterEntity? filter}) async {
     final q = query.trim().toLowerCase();
     return _mockListings.where((l) {
       if (l.listingFor != listingFor) return false;
-      if (q.isEmpty) return true;
-      return l.title.toLowerCase().contains(q) ||
-          l.locality.toLowerCase().contains(q) ||
-          l.city.toLowerCase().contains(q) ||
-          l.type.toLowerCase().contains(q);
+      if (q.isNotEmpty) {
+        final matchesQuery = l.title.toLowerCase().contains(q) ||
+            l.locality.toLowerCase().contains(q) ||
+            l.city.toLowerCase().contains(q) ||
+            l.type.toLowerCase().contains(q);
+        if (!matchesQuery) return false;
+      }
+      if (filter != null) {
+        if (filter.propertyType != null && l.type != filter.propertyType) return false;
+        if (filter.city != null && filter.city!.trim().isNotEmpty &&
+            l.city.toLowerCase() != filter.city!.trim().toLowerCase()) return false;
+        if (filter.locality != null && filter.locality!.trim().isNotEmpty &&
+            !l.locality.toLowerCase().contains(filter.locality!.trim().toLowerCase())) return false;
+        if (filter.minPrice != null && l.price < filter.minPrice!) return false;
+        if (filter.maxPrice != null && l.price > filter.maxPrice!) return false;
+        if (filter.minBedrooms != null && l.bedrooms < filter.minBedrooms!) return false;
+        if (filter.minAreaSqft != null && l.areaSqft < filter.minAreaSqft!) return false;
+      }
+      return true;
     }).toList();
   }
 
