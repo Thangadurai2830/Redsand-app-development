@@ -6,6 +6,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../auth/domain/entities/user_role.dart';
 import '../../../dashboard/presentation/pages/admin_dashboard_page.dart';
 import '../../../dashboard/presentation/pages/user_dashboard_page.dart';
+import '../../../owner_dashboard/presentation/pages/owner_dashboard_page.dart';
 import '../bloc/otp_bloc.dart';
 import '../bloc/otp_event.dart';
 import '../bloc/otp_state.dart';
@@ -106,9 +107,11 @@ class _OtpViewState extends State<_OtpView> {
   }
 
   void _navigateToDashboard(BuildContext context, UserRole role) {
-    final page = role == UserRole.admin
-        ? const AdminDashboardPage()
-        : const UserDashboardPage();
+    final page = switch (role) {
+      UserRole.admin => const AdminDashboardPage(),
+      UserRole.owner => const OwnerDashboardPage(),
+      _ => const UserDashboardPage(),
+    };
 
     Navigator.of(context).pushAndRemoveUntil(
       MaterialPageRoute(builder: (_) => page),

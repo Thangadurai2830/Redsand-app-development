@@ -428,7 +428,7 @@ class _ProfileView extends StatelessWidget {
             TextButton(
               onPressed: () async {
                 await Clipboard.setData(ClipboardData(text: visit.receiptUrl!));
-                Navigator.of(dialogContext).pop();
+                if (dialogContext.mounted) Navigator.of(dialogContext).pop();
               },
               child: const Text('Copy link'),
             ),

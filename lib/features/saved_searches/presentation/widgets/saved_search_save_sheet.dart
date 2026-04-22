@@ -214,7 +214,7 @@ class _SummaryCard extends StatelessWidget {
       child: Wrap(
         spacing: 8,
         runSpacing: 8,
-        children: chips.isEmpty ? [_Chip(text: 'No filters selected')] : chips,
+        children: chips.isEmpty ? [const _Chip(text: 'No filters selected')] : chips,
       ),
     );
   }

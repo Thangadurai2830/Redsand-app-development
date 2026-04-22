@@ -3,15 +3,20 @@ part of 'login_bloc.dart';
 abstract class LoginEvent extends Equatable {
   const LoginEvent();
   @override
-  List<Object> get props => [];
+  List<Object?> get props => [];
 }
 
 class LoginSubmitted extends LoginEvent {
   final String email;
   final String password;
-  const LoginSubmitted({required this.email, required this.password});
+  final UserRole? selectedRole;
+  const LoginSubmitted({
+    required this.email,
+    required this.password,
+    this.selectedRole,
+  });
   @override
-  List<Object> get props => [email, password];
+  List<Object?> get props => [email, password, selectedRole];
 }
 
 class LoginWithOtpRequested extends LoginEvent {
@@ -26,4 +31,8 @@ class LoginWithGoogleRequested extends LoginEvent {
   const LoginWithGoogleRequested({required this.idToken});
   @override
   List<Object> get props => [idToken];
+}
+
+class LogoutRequested extends LoginEvent {
+  const LogoutRequested();
 }

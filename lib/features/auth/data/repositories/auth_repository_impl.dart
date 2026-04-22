@@ -1,9 +1,11 @@
 import 'package:dartz/dartz.dart';
 import '../../../../core/error/failures.dart';
 import '../../domain/entities/auth_token.dart';
+import '../../domain/entities/user_role.dart';
 import '../../domain/repositories/auth_repository.dart';
 import '../datasources/auth_local_data_source.dart';
 import '../datasources/auth_remote_data_source.dart';
+import '../models/auth_token_model.dart';
 
 class AuthRepositoryImpl implements AuthRepository {
   final AuthLocalDataSource localDataSource;
@@ -40,11 +42,20 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<Either<Failure, AuthToken>> login(String email, String password) async {
+  Future<Either<Failure, AuthToken>> login(String email, String password, {String? role}) async {
     try {
-      final token = await remoteDataSource.login(email, password);
-      await localDataSource.saveToken(token);
-      return Right(token);
+      final token = await remoteDataSource.login(email, password, role: role);
+      final effectiveRole = role != null
+          ? UserRole.values.firstWhere((r) => r.name == role, orElse: () => token.role)
+          : token.role;
+      final tokenToSave = AuthTokenModel(
+        accessToken: token.accessToken,
+        refreshToken: token.refreshToken,
+        role: effectiveRole,
+        expiresAt: token.expiresAt,
+      );
+      await localDataSource.saveToken(tokenToSave);
+      return Right(tokenToSave);
     } on NetworkFailure catch (f) {
       return Left(f);
     } on CacheFailure catch (f) {

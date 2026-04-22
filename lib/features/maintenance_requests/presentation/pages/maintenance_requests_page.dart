@@ -769,8 +769,8 @@ class _EmptyHistory extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 24),
-      child: Column(
-        children: const [
+      child: const Column(
+        children: [
           Icon(Icons.inbox_outlined, size: 44, color: AppColors.secondaryGrayText),
           SizedBox(height: 12),
           Text(

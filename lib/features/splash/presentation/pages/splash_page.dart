@@ -6,6 +6,7 @@ import '../../../../features/onboarding/presentation/pages/onboarding_page.dart'
 import '../../../../features/role_selection/presentation/pages/role_selection_page.dart';
 import '../../../../features/dashboard/presentation/pages/admin_dashboard_page.dart';
 import '../../../../features/dashboard/presentation/pages/user_dashboard_page.dart';
+import '../../../../features/owner_dashboard/presentation/pages/owner_dashboard_page.dart';
 import '../bloc/splash_bloc.dart';
 
 class SplashPage extends StatefulWidget {
@@ -54,6 +55,7 @@ class _SplashPageState extends State<SplashPage>
     if (state is SplashAuthenticated) {
       destination = switch (state.role) {
         UserRole.admin => const AdminDashboardPage(),
+        UserRole.owner => const OwnerDashboardPage(),
         _ => const UserDashboardPage(),
       };
     } else if (state is SplashNeedsOnboarding) {

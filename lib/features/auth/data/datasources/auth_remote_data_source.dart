@@ -5,7 +5,7 @@ import '../models/auth_token_model.dart';
 abstract class AuthRemoteDataSource {
   Future<bool> sendOtp(String email);
   Future<AuthTokenModel> loginWithGoogle(String idToken);
-  Future<AuthTokenModel> login(String email, String password);
+  Future<AuthTokenModel> login(String email, String password, {String? role});
 }
 
 class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
@@ -39,11 +39,15 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   }
 
   @override
-  Future<AuthTokenModel> login(String email, String password) async {
+  Future<AuthTokenModel> login(String email, String password, {String? role}) async {
     try {
       final response = await dio.post(
         '/api/auth/login',
-        data: {'email': email, 'password': password},
+        data: {
+          'email': email,
+          'password': password,
+          if (role != null) 'role': role,
+        },
       );
       return AuthTokenModel.fromJson(response.data as Map<String, dynamic>);
     } on DioException {

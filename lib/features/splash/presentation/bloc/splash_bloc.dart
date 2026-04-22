@@ -27,7 +27,7 @@ class SplashBloc extends Bloc<SplashEvent, SplashState> {
 
     await Future.delayed(const Duration(milliseconds: 2000));
 
-    final authResult = await checkAuthStatus(NoParams());
+    final authResult = await checkAuthStatus(const NoParams());
 
     await authResult.fold(
       (_) async => emit(await _resolveUnauthenticated()),
@@ -42,7 +42,7 @@ class SplashBloc extends Bloc<SplashEvent, SplashState> {
   }
 
   Future<SplashState> _resolveUnauthenticated() async {
-    final onboardingResult = await checkOnboardingStatus(NoParams());
+    final onboardingResult = await checkOnboardingStatus(const NoParams());
     return onboardingResult.fold(
       (_) => const SplashNeedsOnboarding(),
       (done) => done ? const SplashUnauthenticated() : const SplashNeedsOnboarding(),

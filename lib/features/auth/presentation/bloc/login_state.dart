@@ -35,3 +35,14 @@ class LoginOtpSent extends LoginState {
   @override
   List<Object> get props => [email];
 }
+
+class LogoutSuccess extends LoginState {
+  const LogoutSuccess();
+}
+
+class LogoutFailure extends LoginState {
+  final String message;
+  const LogoutFailure(this.message);
+  @override
+  List<Object> get props => [message];
+}

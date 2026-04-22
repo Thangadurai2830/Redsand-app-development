@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../core/di/injection_container.dart' as di;
 import '../../../../core/theme/app_colors.dart';
+import '../../../auth/presentation/bloc/login_bloc.dart';
 import '../../../feature_selection/presentation/pages/feature_selection_page.dart';
 import '../../../home/presentation/bloc/home_bloc.dart';
 import '../../../home/presentation/pages/home_page.dart';
@@ -22,8 +23,11 @@ class UserDashboardPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) => di.sl<ProfileBloc>()..add(const ProfileLoadRequested()),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(create: (_) => di.sl<LoginBloc>()),
+        BlocProvider(create: (_) => di.sl<ProfileBloc>()..add(const ProfileLoadRequested())),
+      ],
       child: const _UserDashboardView(),
     );
   }
@@ -47,7 +51,17 @@ class _UserDashboardView extends StatelessWidget {
         final profile = state.profile;
         final isInitialLoading = state.status == ProfileStatus.loading && profile == null;
 
-        return Scaffold(
+        return BlocListener<LoginBloc, LoginState>(
+          listener: (context, loginState) {
+            if (loginState is LogoutSuccess) {
+              Navigator.of(context).pushNamedAndRemoveUntil('/', (route) => false);
+            } else if (loginState is LogoutFailure) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text(loginState.message), backgroundColor: Colors.red),
+              );
+            }
+          },
+          child: Scaffold(
           backgroundColor: AppColors.lightGrayBg,
           appBar: AppBar(
             backgroundColor: AppColors.deepRoyalPurple,
@@ -70,6 +84,11 @@ class _UserDashboardView extends StatelessWidget {
                 onPressed: () => Navigator.of(context).push(
                   MaterialPageRoute(builder: (_) => const ProfilePage()),
                 ),
+              ),
+              IconButton(
+                tooltip: 'Logout',
+                icon: const Icon(Icons.logout_rounded),
+                onPressed: () => _confirmLogout(context),
               ),
             ],
           ),
@@ -102,7 +121,7 @@ class _UserDashboardView extends StatelessWidget {
                             completeness: _profileCompleteness(profile),
                           ),
                           const SizedBox(height: 16),
-                          _SectionHeader(
+                          const _SectionHeader(
                             title: 'Quick Actions',
                             subtitle: 'Access the tools you use most often.',
                           ),
@@ -173,7 +192,7 @@ class _UserDashboardView extends StatelessWidget {
                             ],
                           ),
                           const SizedBox(height: 16),
-                          _SectionHeader(
+                          const _SectionHeader(
                             title: 'Recommended Next Step',
                             subtitle: 'A simple path to keep your account in top shape.',
                           ),
@@ -185,7 +204,7 @@ class _UserDashboardView extends StatelessWidget {
                             ),
                           ),
                           const SizedBox(height: 16),
-                          _SectionHeader(
+                          const _SectionHeader(
                             title: 'Recent Activity',
                             subtitle: 'Your latest visits and account activity.',
                           ),
@@ -200,9 +219,33 @@ class _UserDashboardView extends StatelessWidget {
                         ],
                       ),
                     ),
+          ),
         );
       },
     );
+  }
+}
+
+Future<void> _confirmLogout(BuildContext context) async {
+  final confirmed = await showDialog<bool>(
+    context: context,
+    builder: (ctx) => AlertDialog(
+      title: const Text('Log out?'),
+      content: const Text('You will be returned to the login screen.'),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(ctx).pop(false),
+          child: const Text('Cancel'),
+        ),
+        TextButton(
+          onPressed: () => Navigator.of(ctx).pop(true),
+          child: const Text('Log out', style: TextStyle(color: Colors.red)),
+        ),
+      ],
+    ),
+  );
+  if (confirmed == true && context.mounted) {
+    context.read<LoginBloc>().add(const LogoutRequested());
   }
 }
 
@@ -451,7 +494,7 @@ class _OverviewRow extends StatelessWidget {
         icon: Icons.verified_user_outlined,
         accent: profile?.isKycComplete == true ? AppColors.mintGreen : AppColors.softLavender,
       ),
-      _MiniStat(
+      const _MiniStat(
         label: 'Support',
         value: '24/7',
         icon: Icons.support_agent_rounded,

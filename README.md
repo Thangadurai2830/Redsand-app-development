@@ -628,7 +628,7 @@ Plans: `FREE` · `BASIC` · `PRO` · `ENTERPRISE`
 
 | API | Method | Purpose |
 |---|---|---|
-| `/api/notifications` | `GET` | Fetch all notifications |
+| `/api/notifications` | `GET` | Fetch all notifications | 
 | `/api/notifications/{id}/read` | `POST` | Mark one as read |
 | `/api/notifications/read-all` | `POST` | Mark all as read |
 

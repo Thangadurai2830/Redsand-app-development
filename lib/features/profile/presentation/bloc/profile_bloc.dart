@@ -3,7 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/error/failures.dart';
 import '../../../../core/usecases/usecase.dart';
 import '../../domain/entities/kyc_submission_request.dart';
-import '../../domain/entities/profile_update_request.dart';
 import '../../domain/usecases/get_profile.dart';
 import '../../domain/usecases/get_site_visits.dart';
 import '../../domain/usecases/submit_kyc_documents.dart';

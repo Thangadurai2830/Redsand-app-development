@@ -5,6 +5,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../auth/domain/entities/user_role.dart';
 import '../../../dashboard/presentation/pages/admin_dashboard_page.dart';
 import '../../../dashboard/presentation/pages/user_dashboard_page.dart';
+import '../../../owner_dashboard/presentation/pages/owner_dashboard_page.dart';
 import '../../../otp/presentation/pages/otp_page.dart';
 import '../../../register/presentation/pages/register_page.dart';
 import '../bloc/login_bloc.dart';
@@ -51,6 +52,7 @@ class _LoginViewState extends State<_LoginView> {
     context.read<LoginBloc>().add(LoginSubmitted(
           email: _emailCtrl.text.trim(),
           password: _passwordCtrl.text,
+          selectedRole: widget.selectedRole,
         ));
   }
 
@@ -77,9 +79,11 @@ class _LoginViewState extends State<_LoginView> {
   }
 
   void _navigateToDashboard(UserRole role) {
-    final page = role == UserRole.admin
-        ? const AdminDashboardPage()
-        : const UserDashboardPage();
+    final page = switch (role) {
+      UserRole.admin => const AdminDashboardPage(),
+      UserRole.owner => const OwnerDashboardPage(),
+      _ => const UserDashboardPage(),
+    };
     Navigator.of(context).pushAndRemoveUntil(
       MaterialPageRoute(builder: (_) => page),
       (_) => false,

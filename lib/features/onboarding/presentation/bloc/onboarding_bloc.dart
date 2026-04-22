@@ -30,7 +30,7 @@ class OnboardingBloc extends Bloc<OnboardingEvent, OnboardingState> {
     Emitter<OnboardingState> emit,
   ) async {
     emit(const OnboardingLoading());
-    final result = await getOnboardingSlides(NoParams());
+    final result = await getOnboardingSlides(const NoParams());
     result.fold(
       (failure) => emit(const OnboardingError('Failed to load slides')),
       (slides) => emit(OnboardingLoaded(slides: slides)),
@@ -51,7 +51,7 @@ class OnboardingBloc extends Bloc<OnboardingEvent, OnboardingState> {
     OnboardingSkipped event,
     Emitter<OnboardingState> emit,
   ) async {
-    await markOnboardingComplete(NoParams());
+    await markOnboardingComplete(const NoParams());
     emit(const OnboardingFinished());
   }
 
@@ -59,7 +59,7 @@ class OnboardingBloc extends Bloc<OnboardingEvent, OnboardingState> {
     OnboardingCompleted event,
     Emitter<OnboardingState> emit,
   ) async {
-    await markOnboardingComplete(NoParams());
+    await markOnboardingComplete(const NoParams());
     emit(const OnboardingFinished());
   }
 }

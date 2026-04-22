@@ -12,6 +12,7 @@ import '../../features/auth/data/repositories/auth_repository_impl.dart';
 import '../../features/auth/domain/repositories/auth_repository.dart';
 import '../../features/auth/domain/usecases/check_auth_status.dart';
 import '../../features/auth/domain/usecases/login.dart';
+import '../../features/auth/domain/usecases/logout.dart';
 import '../../features/auth/domain/usecases/send_otp.dart';
 import '../../features/auth/domain/usecases/login_with_google.dart';
 import '../../features/auth/presentation/bloc/login_bloc.dart';
@@ -99,6 +100,16 @@ import '../../features/saved_listings/domain/usecases/get_saved_listings.dart';
 import '../../features/saved_listings/domain/usecases/remove_saved_listing.dart';
 import '../../features/saved_listings/presentation/bloc/saved_listings_bloc.dart';
 
+// Owner dashboard feature
+import '../../features/owner_dashboard/data/datasources/owner_dashboard_remote_data_source.dart';
+import '../../features/owner_dashboard/data/repositories/owner_dashboard_repository_impl.dart';
+import '../../features/owner_dashboard/domain/repositories/owner_dashboard_repository.dart';
+import '../../features/owner_dashboard/domain/usecases/boost_owner_listing.dart';
+import '../../features/owner_dashboard/domain/usecases/get_owner_analytics.dart';
+import '../../features/owner_dashboard/domain/usecases/get_owner_interests.dart';
+import '../../features/owner_dashboard/domain/usecases/get_owner_listings.dart';
+import '../../features/owner_dashboard/presentation/bloc/owner_dashboard_bloc.dart';
+
 // Profile feature
 import '../../features/profile/data/datasources/profile_local_data_source.dart';
 import '../../features/profile/data/datasources/profile_remote_data_source.dart';
@@ -161,11 +172,13 @@ Future<void> init() async {
   // ─── Auth ─────────────────────────────────────────────────────────────────
   sl.registerFactory(() => LoginBloc(
         login: sl(),
+        logout: sl(),
         sendOtp: sl(),
         loginWithGoogle: sl(),
       ));
   sl.registerLazySingleton(() => CheckAuthStatus(sl()));
   sl.registerLazySingleton(() => Login(sl()));
+  sl.registerLazySingleton(() => Logout(sl()));
   sl.registerLazySingleton(() => SendOtp(sl()));
   sl.registerLazySingleton(() => LoginWithGoogle(sl()));
   sl.registerLazySingleton<AuthRepository>(
@@ -349,6 +362,24 @@ Future<void> init() async {
   );
   sl.registerLazySingleton<SavedListingsLocalDataSource>(
     () => SavedListingsLocalDataSourceImpl(),
+  );
+
+  // ─── Owner Dashboard ────────────────────────────────────────────────────
+  sl.registerFactory(() => OwnerDashboardBloc(
+        getOwnerListings: sl(),
+        getOwnerInterests: sl(),
+        getOwnerAnalytics: sl(),
+        boostOwnerListing: sl(),
+      ));
+  sl.registerLazySingleton(() => GetOwnerListings(sl()));
+  sl.registerLazySingleton(() => GetOwnerInterests(sl()));
+  sl.registerLazySingleton(() => GetOwnerAnalytics(sl()));
+  sl.registerLazySingleton(() => BoostOwnerListing(sl()));
+  sl.registerLazySingleton<OwnerDashboardRepository>(
+    () => OwnerDashboardRepositoryImpl(remoteDataSource: sl()),
+  );
+  sl.registerLazySingleton<OwnerDashboardRemoteDataSource>(
+    () => OwnerDashboardRemoteDataSourceImpl(dio: sl()),
   );
 
   // ─── Profile ─────────────────────────────────────────────────────────────

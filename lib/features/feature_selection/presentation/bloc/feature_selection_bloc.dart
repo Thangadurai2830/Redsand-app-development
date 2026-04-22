@@ -26,7 +26,7 @@ class FeatureSelectionBloc extends Bloc<FeatureSelectionEvent, FeatureSelectionS
 
   Future<void> _onLoadFeatures(LoadFeatures event, Emitter<FeatureSelectionState> emit) async {
     emit(FeatureSelectionLoading());
-    final result = await getFeatures(NoParams());
+    final result = await getFeatures(const NoParams());
     result.fold(
       (failure) => emit(const FeatureSelectionError('Failed to load features')),
       (features) => emit(FeatureSelectionLoaded(features: features)),

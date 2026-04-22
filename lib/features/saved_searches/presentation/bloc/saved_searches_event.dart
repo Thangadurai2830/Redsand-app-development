@@ -1,8 +1,6 @@
 import 'package:equatable/equatable.dart';
 
 import '../../../filter/domain/entities/filter_entity.dart';
-import '../../domain/entities/saved_search_alert.dart';
-
 abstract class SavedSearchesEvent extends Equatable {
   const SavedSearchesEvent();
 

@@ -285,7 +285,7 @@ class _SavedSearchCard extends StatelessWidget {
                   if (search.filter.minBedrooms != null) _Chip(text: '${search.filter.minBedrooms} BHK'),
                   _Chip(text: search.notifyByPush ? 'Push' : 'No push'),
                   _Chip(text: search.notifyInApp ? 'In-app' : 'No in-app'),
-                  if (search.priceDropAlert) _Chip(text: 'Price drop'),
+                  if (search.priceDropAlert) const _Chip(text: 'Price drop'),
                 ],
               ),
               const SizedBox(height: 12),
