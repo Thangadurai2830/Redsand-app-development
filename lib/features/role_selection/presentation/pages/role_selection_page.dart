@@ -28,7 +28,7 @@ class _RoleSelectionView extends StatelessWidget {
     return BlocListener<RoleSelectionBloc, RoleSelectionState>(
       listener: (context, state) {
         if (state is RoleSelectionSaved) {
-          Navigator.of(context).pushReplacement(
+          Navigator.of(context).push(
             MaterialPageRoute(
               builder: (_) => LoginPage(selectedRole: state.role),
             ),

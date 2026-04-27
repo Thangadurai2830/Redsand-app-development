@@ -9,6 +9,7 @@ import 'package:flutter_app/features/auth/domain/repositories/auth_repository.da
 import 'package:flutter_app/features/auth/domain/usecases/check_auth_status.dart';
 import 'package:flutter_app/features/auth/domain/usecases/login.dart';
 import 'package:flutter_app/features/auth/domain/usecases/login_with_google.dart';
+import 'package:flutter_app/features/auth/domain/usecases/logout.dart';
 import 'package:flutter_app/features/auth/domain/usecases/send_otp.dart';
 import 'package:flutter_app/features/feature_selection/domain/entities/app_feature.dart';
 import 'package:flutter_app/features/feature_selection/domain/repositories/feature_repository.dart';
@@ -272,6 +273,18 @@ class FakeSendOtpUseCase implements SendOtp {
 
   @override
   Future<Either<Failure, bool>> call(String email) async => result;
+}
+
+class FakeLogoutUseCase implements Logout {
+  Either<Failure, void> result;
+
+  FakeLogoutUseCase(this.result);
+
+  @override
+  AuthRepository get repository => throw UnimplementedError();
+
+  @override
+  Future<Either<Failure, void>> call(NoParams params) async => result;
 }
 
 class FakeLoginWithGoogleUseCase implements LoginWithGoogle {

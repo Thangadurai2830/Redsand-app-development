@@ -17,6 +17,7 @@ void main() {
     );
     final bloc = LoginBloc(
       login: FakeLoginUseCase(Right(token)),
+      logout: FakeLogoutUseCase(const Right(null)),
       sendOtp: FakeSendOtpUseCase(const Right(true)),
       loginWithGoogle: FakeLoginWithGoogleUseCase(Right(token)),
     );
@@ -41,6 +42,7 @@ void main() {
   test('requesting OTP emits loading then OTP sent', () async {
     final bloc = LoginBloc(
       login: FakeLoginUseCase(Left(NetworkFailure())),
+      logout: FakeLogoutUseCase(const Right(null)),
       sendOtp: FakeSendOtpUseCase(const Right(true)),
       loginWithGoogle: FakeLoginWithGoogleUseCase(Left(NetworkFailure())),
     );

@@ -161,7 +161,7 @@ Future<void> init() async {
   // ─── External ─────────────────────────────────────────────────────────────
   final sharedPreferences = await SharedPreferences.getInstance();
   sl.registerSingleton<SharedPreferences>(sharedPreferences);
-  sl.registerLazySingleton<Dio>(() => ApiClient.create());
+  sl.registerLazySingleton<Dio>(() => ApiClient.create(sharedPreferences: sl()));
 
   // ─── Splash ───────────────────────────────────────────────────────────────
   sl.registerFactory(() => SplashBloc(
